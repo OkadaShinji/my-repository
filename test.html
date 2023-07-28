@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>料金シミュレーション</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #33aa33;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+
+    .options-container {
+      margin-top: 20px;
+    }
+
+    button {
+      background-color: #33aa33;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    h2 {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>料金シミュレーション</h1>
+
+  <label>デバイス選択:</label>
+  <label><input type="radio" name="device" value="PC"> PC</label>
+  <label><input type="radio" name="device" value="タブレット"> タブレット</label>
+  <label><input type="radio" name="device" value="スマートフォン"> スマートフォン</label>
+
+  <div class="options-container" id="osSelection" style="display:none;">
+    <label>OS選択:</label>
+    <label><input type="radio" name="os" value="Windows"> Windows</label>
+    <label><input type="radio" name="os" value="Linux"> Linux</label>
+    <label><input type="radio" name="os" value="Android"> Android</label>
+    <label><input type="radio" name="os" value="iOS"> iOS</label>
+  </div>
+
+  <div class="options-container" id="optionsSelection" style="display:none;">
+    <h3>オプション選択:</h3>
+    <label><input type="checkbox" name="option" value="管理シール貼り付け"> 管理シール貼り付け</label>
+    <label><input type="checkbox" name="option" value="MDM導入"> MDM導入</label>
+    <label><input type="checkbox" name="option" value="台帳作成・管理"> 台帳作成・管理</label>
+    <label><input type="checkbox" name="option" value="手順書作成"> 手順書作成</label>
+    <label><input type="checkbox" name="option" value="セキュリティソフト導入"> セキュリティソフト導入</label>
+    <label><input type="checkbox" name="option" value="設定値の変更(1～20項目)"> 設定値の変更(1～20項目)</label>
+    <label><input type="checkbox" name="option" value="設定値の変更(20項目～)"> 設定値の変更(20項目～)</label>
+    <label><input type="checkbox" name="option" value="故障機交換対応"> 故障機交換対応</label>
+    <label><input type="checkbox" name="option" value="MDM運用サポート"> MDM運用サポート</label>
+    <label><input type="checkbox" name="option" value="端末操作等サポート"> 端末操作等サポート</label>
+    <label><input type="checkbox" name="option" value="ADE導入サポート"> ADE導入サポート</label>
+  </div>
+
+  <label>台数:</label>
+  <input type="number" id="quantity" min="1" value="1">
+
+  <button onclick="calculateTotal()">計算</button>
+
+  <h2>合計金額: <span id="totalPrice">0</span> </h2>
+
+
+</body>
+<script>
+    const option_array = [
+        "管理シール貼り付け",
+        "MDM導入",
+        "台帳作成・管理",
+        "手順書作成",
+        "セキュリティソフト導入",
+        "設定値の変更(1～20項目)",
+        "設定値の変更(20項目～)",
+        "故障機交換対応",
+        "MDM運用サポート",
+        "端末操作等サポート",
+        "ADE導入サポート"
+];
+    function calculateTotal() {
+      const device = document.querySelector('input[name="device"]:checked').value;
+      const os = document.querySelector('input[name="os"]:checked').value;
+      const options = Array.from(document.querySelectorAll('input[name="option"]:checked')).map(checkbox => checkbox.value);
+      const quantity = parseInt(document.getElementById('quantity').value);
+
+      let basePrice = 0;
+      let optionPrice = 0;
+
+      // デバイス毎の基本料金
+      switch (device) {
+        case "PC":
+          basePrice = 1000;
+          break;
+        case "タブレット":
+        case "スマートフォン":
+          basePrice = 800;
+          break;
+      }
+
+      // OSによるオプション選択
+      switch (os) {
+        case "Windows":
+          optionPrice += options.includes("管理シール貼り付け") ? 200 : 0;
+          optionPrice += options.includes("MDM導入") ? 300 : 0;
+          optionPrice += options.includes("台帳作成・管理") ? 150 : 0;
+          optionPrice += options.includes("手順書作成") ? 180 : 0;
+          optionPrice += options.includes("セキュリティソフト導入") ? 250 : 0;
+          break;
+        case "Linux":
+          optionPrice += options.includes("管理シール貼り付け") ? 200 : 0;
+          optionPrice += options.includes("MDM導入") ? 0 : 0;
+          optionPrice += options.includes("台帳作成・管理") ? 150 : 0;
+          optionPrice += options.includes("手順書作成") ? 0 : 0;
+          optionPrice += options.includes("セキュリティソフト導入") ? 0 : 0;
+          break;
+        case "Android":
+        case "iOS":
+          optionPrice += options.includes("管理シール貼り付け") ? 200 : 0;
+          optionPrice += options.includes("MDM導入") ? 300 : 0;
+          optionPrice += options.includes("設定値の変更(1～20項目)") ? 100 : 0;
+          optionPrice += options.includes("設定値の変更(20項目～)") ? 200 : 0;
+          optionPrice += options.includes("故障機交換対応") ? 150 : 0;
+          optionPrice += options.includes("MDM運用サポート") ? 300 : 0;
+          optionPrice += options.includes("端末操作等サポート") ? 180 : 0;
+          optionPrice += options.includes("ADE導入サポート") ? 250 : 0;
+          break;
+      }
+
+      const totalPrice = (basePrice + optionPrice) * quantity;
+
+      // 結果を表示
+      document.getElementById('totalPrice').textContent = totalPrice;
+    }
+
+    // デバイスの選択に応じてOS選択肢を表示・非表示にする
+    const deviceRadios = document.getElementsByName('device');
+    deviceRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.getElementById('osSelection').style.display = 'block';
+        document.getElementById('optionsSelection').style.display = 'none';
+
+        const osRadios = document.getElementsByName('os');
+        osRadios.forEach(osRadio => {
+          osRadio.checked = false;
+          osRadio.disabled = true;
+        });
+
+        switch (radio.value) {
+          case "PC":
+            document.querySelector('input[name="os"][value="Windows"]').disabled = false;
+            document.querySelector('input[name="os"][value="Linux"]').disabled = false;
+            break;
+          case "タブレット":
+          case "スマートフォン":
+            document.querySelector('input[name="os"][value="Android"]').disabled = false;
+            document.querySelector('input[name="os"][value="iOS"]').disabled = false;
+            break;
+        }
+      });
+    });
+
+    // OSの選択に応じてオプション選択肢を表示・非表示にする
+    const osRadios = document.getElementsByName('os');
+    osRadios.forEach(osRadio => {
+      osRadio.addEventListener('change', () => {
+        document.getElementById('optionsSelection').style.display = 'block';
+
+        const optionCheckboxes = document.getElementsByName('option');
+        optionCheckboxes.forEach(checkbox => {
+          checkbox.checked = false;
+          checkbox.disabled = true;
+        });
+
+        const device = document.querySelector('input[name="device"]:checked').value;
+        const os = document.querySelector('input[name="os"]:checked').value;
+
+        switch (device + os) {
+          case "PCWindows":
+            document.querySelector(`input[name="option"][value=${option_array[0]}]`).disabled = false;
+            document.querySelector(`input[name="option"][value="台帳作成・管理"]`).disabled = false;
+            document.querySelector('input[name="option"][value="手順書作成"]').disabled = false;
+            document.querySelector('input[name="option"][value="セキュリティソフト導入"]').disabled = false;
+            break;
+          case "PCLinux":
+            document.querySelector('input[name="option"][value="管理シール貼り付け"]').disabled = false;
+            document.querySelector('input[name="option"][value="台帳作成・管理"]').disabled = false;
+            document.querySelector('input[name="option"][value="手順書作成"]').disabled = false;
+            document.querySelector('input[name="option"][value="設定値の変更(1～20項目)"]').disabled = false;
+            document.querySelector('input[name="option"][value="設定値の変更(20項目～)"]').disabled = false;
+            break;
+          case "タブレットAndroid":
+          case "スマートフォンAndroid":
+            document.querySelector('input[name="option"][value="管理シール貼り付け"]').disabled = false;
+            document.querySelector('input[name="option"][value="MDM導入"]').disabled = false;
+            document.querySelector('input[name="option"][value="台帳作成・管理"]').disabled = false;
+            document.querySelector('input[name="option"][value="手順書作成"]').disabled = false;
+            document.querySelector('input[name="option"][value="設定値の変更(1～20項目)"]').disabled = false;
+            document.querySelector('input[name="option"][value="設定値の変更(20項目～)"]').disabled = false;
+            document.querySelector('input[name="option"][value="故障機交換対応"]').disabled = false;
+            document.querySelector('input[name="option"][value="MDM運用サポート"]').disabled = false;
+            document.querySelector('input[name="option"][value="端末操作等サポート"]').disabled = false;
+            break;
+          case "タブレットiOS":
+          case "スマートフォンiOS":
+            document.querySelector('input[name="option"][value="管理シール貼り付け"]').disabled = false;
+            document.querySelector('input[name="option"][value="MDM導入"]').disabled = false;
+            document.querySelector('input[name="option"][value="台帳作成・管理"]').disabled = false;
+            document.querySelector('input[name="option"][value="手順書作成"]').disabled = false;
+            document.querySelector('input[name="option"][value="設定値の変更(1～20項目)"]').disabled = false;
+            document.querySelector('input[name="option"][value="設定値の変更(20項目～)"]').disabled = false;
+            document.querySelector('input[name="option"][value="故障機交換対応"]').disabled = false;
+            document.querySelector('input[name="option"][value="MDM運用サポート"]').disabled = false;
+            document.querySelector('input[name="option"][value="端末操作等サポート"]').disabled = false;
+            document.querySelector('input[name="option"][value="ADE導入サポート"]').disabled = false;
+            break;
+        }
+      });
+    });
+  </script>
+
+</html>
